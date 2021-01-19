@@ -1,0 +1,15 @@
+<!doctype html>
+<head>
+<script src="chatbot.js"></script>
+</head>
+<body onLoad="document.AI.BOT.value = beginPhrase;">
+
+<form name=AI onSubmit="return doAI();">
+<br>Chatbot:<br>
+   <textarea cols=50 rows=4 name=Bot wrap=virtual></textarea>
+ 
+ 
+<br>You:<br>
+<input type=text size=50 name=User>
+   </form>
+</body>
