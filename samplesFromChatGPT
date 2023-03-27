@@ -1,0 +1,275 @@
+# Download a file
+<html> 
+<head> 
+<title>File Downloader</title>
+ <script type="text/javascript"> 
+// Function to download files function downloadFile(fileName) { // Create an invisible link and click it var link = document.createElement("a"); link.href = fileName; link.style = "visibility:hidden"; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+// Function to browse for a file
+	function browseForFile() {
+		// Use the FileReader API to read the file
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			// Call the download function with the file name
+			downloadFile(reader.result);
+		}
+// Open a file dialog
+	reader.readAsDataURL(document.getElementById("fileInput").files[0]);
+	}
+</script>
+</head> <body> <input type="file" id="fileInput" /> <button onclick="browseForFile()">Browse</button>
+</body> 
+</html>
+# load a csv file
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>CSV File Viewer</title>
+</head>
+<body>
+	<input type="file" id="fileInput" accept=".csv">
+	<br>
+	<table id="dataTable"></table>
+
+	<script>
+		// Function to load CSV file
+		function loadFile(file) {
+			const reader = new FileReader();
+			reader.onload = function(event) {
+				const csv = event.target.result;
+				const data = processData(csv);
+				renderTable(data);
+			}
+			reader.readAsText(file);
+		}
+
+		// Function to process CSV data
+		function processData(csv) {
+			const lines = csv.split('\n');
+			const headers = lines[0].split(',');
+			const data = [];
+
+			for (let i = 1; i < lines.length; i++) {
+				const row = lines[i].split(',');
+				if (row.length === headers.length) {
+					const obj = {};
+					for (let j = 0; j < headers.length; j++) {
+						obj[headers[j]] = row[j];
+					}
+					data.push(obj);
+				}
+			}
+
+			return data;
+		}
+
+		// Function to render table
+		function renderTable(data) {
+			const table = document.getElementById('dataTable');
+			table.innerHTML = '';
+
+			// Render table header
+			const headerRow = table.insertRow();
+			Object.keys(data[0]).forEach(function(key) {
+				const cell = headerRow.insertCell();
+				cell.innerHTML = key;
+				cell.onclick = function() {
+					sortTable(table, key);
+				};
+			});
+
+			// Render table data
+			data.forEach(function(rowData) {
+				const row = table.insertRow();
+				Object.values(rowData).forEach(function(value) {
+					const cell = row.insertCell();
+					cell.innerHTML = value;
+				});
+			});
+		}
+
+		// Function to sort table
+		function sortTable(table, key) {
+			const tbody = table.querySelector('tbody');
+			const rows = Array.from(tbody.querySelectorAll('tr'));
+
+			// Sort rows based on key
+			rows.sort(function(a, b) {
+				const cellA = a.querySelector(`td:nth-child(${Object.keys(a.cells).indexOf(key) + 1})`).textContent;
+				const cellB = b.querySelector(`td:nth-child(${Object.keys(b.cells).indexOf(key) + 1})`).textContent;
+				return cellA.localeCompare(cellB);
+			});
+
+			// Update table with sorted rows
+			rows.forEach(function(row) {
+				tbody.removeChild(row);
+			});
+			rows.forEach(function(row) {
+				tbody.appendChild(row);
+			});
+		}
+
+		// Attach event listener to file input
+		const fileInput = document.getElementById('fileInput');
+		fileInput.addEventListener('change', function(event) {
+			const file = event.target.files[0];
+			loadFile(file);
+		});
+	</script>
+</body>
+</html>
+
+# another attempt at loading and manipulating a file
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>CSV File Viewer</title>
+</head>
+<body>
+	<input type="file" id="fileInput" accept=".csv">
+	<br>
+	<input type="text" id="filterInput" placeholder="Filter table...">
+	<br>
+	<table id="dataTable"></table>
+
+	<script>
+		let data = [];
+
+		// Function to load CSV file
+		function loadFile(file) {
+			const reader = new FileReader();
+			reader.onload = function(event) {
+				const csv = event.target.result;
+				data = processData(csv);
+				renderTable(data);
+			}
+			reader.readAsText(file);
+		}
+
+		// Function to process CSV data
+		function processData(csv) {
+			const lines = csv.split('\n');
+			const headers = lines[0].split(',');
+			const data = [];
+
+			for (let i = 1; i < lines.length; i++) {
+				const row = lines[i].split(',');
+				if (row.length === headers.length) {
+					const obj = {};
+					for (let j = 0; j < headers.length; j++) {
+						obj[headers[j]] = row[j];
+					}
+					data.push(obj);
+				}
+			}
+
+			return data;
+		}
+
+		// Function to render table
+		function renderTable(data) {
+			const table = document.getElementById('dataTable');
+			table.innerHTML = '';
+
+			// Render table header
+			const headerRow = table.insertRow();
+			Object.keys(data[0]).forEach(function(key) {
+				const cell = headerRow.insertCell();
+				cell.innerHTML = key;
+				cell.onclick = function() {
+					sortTable(table, key);
+				};
+			});
+
+			// Render table data
+			data.forEach(function(rowData) {
+				const row = table.insertRow();
+				Object.values(rowData).forEach(function(value) {
+					const cell = row.insertCell();
+					cell.innerHTML = value;
+				});
+			});
+		}
+
+		// Function to sort table
+		function sortTable(table, key) {
+			const tbody = table.querySelector('tbody');
+			const rows = Array.from(tbody.querySelectorAll('tr'));
+
+			// Sort rows based on key
+			rows.sort(function(a, b) {
+				const cellA = a.querySelector(`td:nth-child(${Object.keys(a.cells).indexOf(key) + 1})`).textContent;
+				const cellB = b.querySelector(`td:nth-child(${Object.keys(b.cells).indexOf(key) + 1})`).textContent;
+				return cellA.localeCompare(cellB);
+			});
+
+			// Update table with sorted rows
+			rows.forEach(function(row) {
+				tbody.removeChild(row);
+			});
+			rows.forEach(function(row) {
+				tbody.appendChild(row);
+			});
+		}
+
+		// Function to filter table
+		function filterTable(data, filterValue) {
+			const filteredData = data.filter(function(rowData) {
+				return Object.values(rowData).some(function(value) {
+					return value.toLowerCase().includes(filterValue.toLowerCase());
+				});
+			});
+			renderTable(filteredData);
+		}
+
+		// Attach event listener to file input
+		const fileInput = document.getElementById('fileInput');
+		fileInput.addEventListener('change', function(event) {
+			const file = event.target.files[0];
+			loadFile(file);
+		});
+
+		// Attach event listener to filter input
+		const filterInput = document.getElementById('filterInput');
+		filterInput.addEventListener('input', function() {
+			filterTable(data, filterInput.value);
+		});
+	
+# pivot table
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>PivotTable.js Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.23.0/pivot.min.js"></script>
+  </head>
+  <body>
+    <h1>PivotTable.js Example</h1>
+    <div id="output"></div>
+    <script>
+      const outputContainer = document.getElementById('output');
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.addEventListener('change', handleFileSelect);
+      outputContainer.appendChild(fileInput);
+
+      function handleFileSelect(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const data = event.target.result;
+          const pivotTable = new pivotTableUI(data, {
+            rows: ['Category'],
+            cols: ['Year'],
+            aggregatorName: 'Sum',
+            vals: ['Sales']
+          });
+          outputContainer.appendChild(pivotTable);
+        };
+        reader.readAsText(file);
+      }
+    </script>
+  </body>
+</html>
+
