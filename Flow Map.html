@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JavaScript Flow Map</title>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-map.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/geodata/custom/world/world.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.anychart.com/releases/8.11.0/css/anychart-ui.min.css">
+    <link rel="stylesheet" href="https://cdn.anychart.com/releases/8.11.0/fonts/css/anychart-font.min.css">
+    <style type="text/css">      
+      html, body, #container { 
+        width: 100%; 
+        height: 100%; 
+        margin: 0; 
+        padding: 0; 
+      } 
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script>
+anychart.onDocumentReady(function () {
+  // set data for the destination countries
+  var data = [
+    { points: [28.610198, 77.207584, -30.592659, 145.943667], to: "Australia", total: 100009, curvature: 0.5 },
+    { points: [28.610198, 77.207584, 45.411673, -75.69629], to: "Canada", total: 183310, curvature: 0.8, label: {offsetY: -30} },
+    { points: [28.610198, 77.207584, 52.511693, 13.403121], to: "Germany", total: 34864, curvature: 0.3, label: {anchor: 'center-top', offsetY: -2} },
+    { points: [28.610198, 77.207584, 23.5880, 58.3829], to: "Oman", total: 39550, curvature: -0.5, label: {anchor: 'left-top'} },
+    { points: [28.610198, 77.207584, 25.2854, 51.5310], to: "Qatar", total: 46000, curvature: 0.4, label: {anchor: 'right-top', offsetY: -20} },
+    { points: [28.610198, 77.207584, 55.747362, 37.621273], to: "Russian Federation", total: 18039, curvature: 0.4, label: {anchor: 'left-bottom'} },
+    { points: [28.610198, 77.207584, 24.710437, 46.675164], to: "Saudi Arabia", total: 65800, curvature: 0.7, label: {offsetY: -5} },
+    { points: [28.610198, 77.207584, 24.4539, 54.3773], to: "United Arab Emirates", total: 164000, curvature: 0, label: {anchor: 'left-top', offsetY: -15} },
+    { points: [28.610198, 77.207584, 52.667078, -0.955920], to: "United Kingdom", total: 55465, curvature: 0.4, label: {anchor: 'right-top', offsetY: -25, offsetX: -10} },
+    { points: [28.610198, 77.207584, 38.884053, -77.033513], to: "USA", total: 465791, curvature: -0.6 },
+  ]
+  // create map chart
+  var map = anychart.connector();
+  // create a dataset from the data
+  var dataSet = anychart.data.set(data).mapAs();
+  // include the world map geodata
+  map.geoData(anychart.maps.world);
+  // create 4 series, filtering the data by the number of students
+  createSeries(dataSet.filter('total', filter_function(0, 50000)), 'Less than 50,000', '#A149FA', [1, 0]);
+  createSeries(dataSet.filter('total', filter_function(50000, 100000)), '50,000 - 100,000', '#3B44F6', [2, 1]);
+  createSeries(dataSet.filter('total', filter_function(100000, 200000)), '100,000 - 200,000', '#3EC70B', [4, 1]);
+  createSeries(dataSet.filter('total', filter_function(200000, 500000)), 'More than 200,000', '#F7EC09', [6, 1]);
+  // function to create and configure the series
+  function createSeries(data, name, color, size) {
+    // create the connector lines
+    var connectorSeries = map.connector(data)
+      .name(name)
+      .fill(color)
+      .stroke(color)
+      .color(color);
+    connectorSeries
+      .hovered()
+      .stroke('#808080')
+      .fill('#808080');
+    connectorSeries
+      .hovered()
+      .markers()
+      .stroke('#808080')
+      .fill('#808080');
+    // set labels for the lines
+    connectorSeries
+      .labels()
+      .enabled(true)
+      .position('100%')
+      .fontColor('#2D2D2D')
+      .format(function () {
+        return this.getData('to')
+      });
+    // set arrow markers at the line end
+    connectorSeries
+      .markers()
+      .position('100%')
+      .size(12);
+    // configure the tooltip setting for the series
+    connectorSeries
+      .tooltip()
+      .useHtml(true)
+      .format(function () {
+        return (
+          '<h5 style="font-size:12px; font-weight:400; margin: 0.25rem 0;">To:<b> ' + this.getData('to') + '</b></h5>' +
+          '<h5 style="font-size:12px; font-weight:400; margin: 0.25rem 0;">Total Students: <b>' + this.getData('total').toLocaleString() + '</b></h5>'
+          );
+      });
+    // set the thickness of the connector line based on the number of students
+    connectorSeries
+      .startSize(size[0])
+      .endSize(size[1]);
+  }
+  // set zoom controls
+  var zoomController = anychart.ui.zoom();
+  zoomController.target(map);
+  zoomController.render();
+  // display all labels even if there is an overlap
+  map.overlapMode("allow-overlap");
+  // set the map chart title
+  map.title()
+    .enabled(true)
+    .useHtml(true)
+    .text(
+      '<span style="font-size:15px;font-weight:600;">Top 10 Destination Countries for Indian Students Studying Abroad</span><br/>' +
+      '<span style="font-size: 14px;">The top destination is the U.S.</span>'
+    );
+  // turn on the legend
+  map.legend().enabled(true).position('bottom').padding([20, 0, 0, 0]).fontSize(10);
+  map.legend().title().enabled(true).text('Number of Students').fontSize(13).padding([0, 0, 5, 0]);
+  // set the container
+  map.container('container');
+  // draw the map
+  map.draw();
+});
+// data filtering function
+function filter_function(val1, val2) {
+  if (val2)
+    return function (fieldVal) {
+      return val1 <= fieldVal && fieldVal < val2;
+    };
+  else
+    return function (fieldVal) {
+      return val1 <= fieldVal;
+    };
+}
+    </script>
+  </body>
+</html>

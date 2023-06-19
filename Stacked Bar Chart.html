@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Stacked Column Chart in JS [Customized 2]</title>
+  <link href="https://playground.anychart.com/jnAHoEsb/iframe" rel="canonical">
+  <meta content="Bar Chart,Column Chart,Tooltip" name="keywords">
+  <meta content="AnyChart - JavaScript Charts designed to be embedded and integrated" name="description">
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+  <style>html,
+  body,
+  #container {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }</style>
+ </head>
+ <body>
+  <div id="container"></div>
+  <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-base.min.js"></script>
+  <script type="text/javascript">anychart.onDocumentReady(function () {
+  
+  // create a column chart
+  var chart = anychart.column();
+
+  // create a data set
+  var dataSet = anychart.data.set([
+    ["Virat Kohli", "India", "148", "100", "48"],
+    ["Max O'Dowd", "Netherlands", "106", "88", "48"],
+    ["Suryakumar Yadav", "India", "81", "104", "54"],
+    ["JD Butler", "England", "87", "96", "42"],
+    ["Kusal Mendis", "Sri Lanka", "95", "68", "60"],
+    ["Sikandar Raza", "Zimbabwe", "89", "64", "66"],
+    ["Pathum Nissanka", "Sri Lanka", "114", "52", "48"],
+    ["AD Hales", "England", "76", "76", "60"],
+    ["Lorkan Tucker", "Ireland", "104", "76", "24"],
+    ["Glenn Phillips", "New Zealand", "77", "76", "48"]
+  ]);
+
+  // map the data
+  var firstSeriesData = dataSet.mapAs({x: 0, value: 4});
+  var secondSeriesData = dataSet.mapAs({x: 0, value: 3});
+  var thirdSeriesData = dataSet.mapAs({x: 0, value: 2});
+
+  // add axis titles
+  chart.xAxis().title("Batsman");
+  chart.yAxis().title("Number of runs");
+
+  // stack values on the y scale
+  chart.yScale().stackMode("value");
+
+  // a function to configure label, and color settings for all series
+  var setupSeries = function (series, name, color) {
+    series.name(name).stroke("2 #fff 1").fill(color);
+  };
+
+  // store the series
+  var series;
+
+  // create the first series with the function
+  firstSeries = chart.column(firstSeriesData);
+  setupSeries(firstSeries, "Runs scored with Sixes", "#eb2362");
+
+  // create the second series with the function
+  secondSeries = chart.column(secondSeriesData);
+  setupSeries(secondSeries, "Runs scored with Fours", "#00b1e5");
+
+  // create the third series with the function
+  thirdSeries = chart.column(thirdSeriesData);
+  setupSeries(thirdSeries, "Running between the wickets", "#0f0449");
+
+  // turn on and configure the legend
+  chart.legend().enabled(true).fontSize(14).padding([10, 0, 10, 0]);
+  
+  // customize the tooltip
+  chart.tooltip().titleFormat(function () {
+    return this.x + " ? " + this.points[0].getStat("categoryYSum");
+  });
+
+  // set the union tooltip display mode
+  chart.tooltip().displayMode("union");
+  
+  // rotate the x labels to make all of them visible
+  chart.xAxis().labels().rotation(-90);
+
+  // add a chart title
+  chart.title("Top 10 Run Scorers at ICC Men's T20 World Cup 2022");
+
+  // customize the chart title
+  chart.title().fontSize(18).fontColor("#2b2b2b").padding([5, 0, 0, 0]);
+
+  // set the container element
+  chart.container("container");
+
+  // display the chart
+  chart.draw();
+  
+});</script>
+ </body>
+</html>
